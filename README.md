@@ -16,9 +16,9 @@ With an intuitive interface and smart tools, it allows real-time tracking of pro
 
 ## 🛠️ Technologies Used
 - **Front-end:** HTML, CSS, JavaScript  
-- **Back-end:** Node.js / PHP *(adjust based on your project)*  
+- **Back-end:** Node.js*  
 - **Database:** MySQL  
-- **Others:** Express / Axios / Bootstrap / Tailwind *(if used)*
+- **Others:** Express / Axios / Tailwind*
 
 ---
 
