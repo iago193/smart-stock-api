@@ -28,7 +28,7 @@ To simplify business management routines by providing a single dashboard to **ma
 ---
 
 ### 🧑‍💻 Author
-Developed by [Your Name](https://github.com/yourusername)
+Developed by [iago192](https://github.com/iago192)
 
 ---
 
