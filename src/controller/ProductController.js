@@ -1,19 +1,31 @@
 class ProductController {
-    index() {
-        console.log('estamos aqui index');
-    }
+  index(req, res) {
+    console.log('estamos aqui index');
+    res.json({
+      res: 'tudo ok',
+    });
+  }
 
-    create() {
-        console.log('estamos aqui create');
-    }
+  create(req, res) {
+    console.log('estamos aqui create');
+    res.json({
+      res: 'tudo ok',
+    });
+  }
 
-    update() {
-        console.log('estamos aqui update');
-    }
+  update(req, res) {
+    console.log('estamos aqui update');
+    res.json({
+      res: 'tudo ok',
+    });
+  }
 
-    delete() {
-        console.log('estamos aqui delete');
-    }
+  delete(req, res) {
+    console.log('estamos aqui delete');
+    res.json({
+      res: 'tudo ok',
+    });
+  }
 }
 
-export default new ProductController;
+export default new ProductController();

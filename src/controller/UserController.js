@@ -1,19 +1,19 @@
 class UserController {
-    index() {
-        console.log('estamos aqui index');
-    }
+  index() {
+    console.log("estamos aqui index");
+  }
 
-    create() {
-        console.log('estamos aqui create');
-    }
+  create() {
+    console.log("estamos aqui create");
+  }
 
-    update() {
-        console.log('estamos aqui update');
-    }
+  update() {
+    console.log("estamos aqui update");
+  }
 
-    delete() {
-        console.log('estamos aqui delete');
-    }
+  delete() {
+    console.log("estamos aqui delete");
+  }
 }
 
-export default new UserController;
+export default new UserController();

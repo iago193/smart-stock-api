@@ -1,5 +1,5 @@
 import express from 'express';
-import productRouter from './src/routes/product-router';
+import productRouter from './src/routes/product-router.js';
 
 class App{
     constructor() {
@@ -11,4 +11,4 @@ class App{
         this.app.use('/products', productRouter);
     }
 }
-export default new App;
+export default new App().app;
