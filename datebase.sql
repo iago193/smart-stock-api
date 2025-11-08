@@ -10,8 +10,8 @@ CREATE TABLE IF NOT EXISTS categories (
 
 -- 2)
 CREATE TABLE IF NOT EXISTS products (
-  id INT AUTO_INCREMENT PRIMARY KEY,                             -- Identificador único do produto
-  name VARCHAR(150) NOT NULL,                                    -- Nome do produto
+  id INT AUTO_INCREMENT PRIMARY KEY,                              -- Identificador único do produto
+  name VARCHAR(150) NOT NULL,                                     -- Nome do produto
   description TEXT,                                               -- Descrição detalhada do produto
   sku VARCHAR(50) UNIQUE,                                         -- Código interno (Stock Keeping Unit)
   barcode VARCHAR(50),                                            -- Código de barras do produto

@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -12,4 +6,38 @@ generator client {
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
+}
+
+model categories {
+  id          Int        @id @default(autoincrement())
+  name        String     @db.VarChar(100)
+  description String?    @db.Text
+  created_at  DateTime?  @default(now()) @db.DateTime(0)
+  products    products[]
+}
+
+model products {
+  id             Int         @id @default(autoincrement())
+  name           String      @db.VarChar(150)
+  description    String?     @db.Text
+  sku            String?     @unique(map: "sku") @db.VarChar(50)
+  barcode        String?     @db.VarChar(50)
+  category_id    Int?
+  brand          String?     @db.VarChar(100)
+  price          Decimal     @db.Decimal(10, 2)
+  discount_price Decimal?    @db.Decimal(10, 2)
+  stock          Int         @default(0)
+  weight         Decimal?    @db.Decimal(10, 3)
+  width          Decimal?    @db.Decimal(10, 2)
+  height         Decimal?    @db.Decimal(10, 2)
+  length         Decimal?    @db.Decimal(10, 2)
+  image_url      String?     @db.VarChar(255)
+  is_active      Boolean?    @default(true)
+  created_at     DateTime?   @default(now()) @db.DateTime(0)
+  updated_at     DateTime?   @default(now()) @db.DateTime(0)
+  categories     categories? @relation(fields: [category_id], references: [id], map: "fk_products_category")
+
+  @@index([barcode], map: "idx_products_barcode")
+  @@index([category_id], map: "idx_products_category")
+  @@index([name], map: "idx_products_name")
 }
