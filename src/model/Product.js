@@ -1,13 +1,15 @@
 import { prisma } from '../lib/prismaClient.js';
+import { formatProductData } from '../utils/formatData.js';
 
 class Product {
   read() {
     console.log('estamos aqui product read');
   }
 
-  async create({ data }) {
+  async create(data) {
     try {
-      const productCreate = await prisma.Product.create({ data });
+      const formatted = formatProductData(data);
+      const productCreate = await prisma.products.create({ data: formatted });
       return productCreate;
     } catch (error) {
       console.log('new error:', error.message);

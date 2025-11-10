@@ -1,4 +1,4 @@
-import { product } from '../model/Product.js';
+import product from '../model/Product.js';
 
 class ProductController {
   index(req, res) {
@@ -10,7 +10,7 @@ class ProductController {
 
   async create(req, res) {
     try {
-      const response = await product.create({ data: req.body });
+      const response = await product.create(req.body);
       res.status(201).json({
         message: 'Produto criado com sucesso!',
         data: response,
