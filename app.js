@@ -1,5 +1,5 @@
 import express from 'express';
-import productRouter from './src/routes/product-router.js';
+import productRouter from './src/routes/productRouter.js';
 import dotenv from 'dotenv';
 dotenv.config();
 

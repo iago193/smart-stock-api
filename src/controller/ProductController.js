@@ -1,11 +1,26 @@
 import product from '../model/Product.js';
 
 class ProductController {
-  index(req, res) {
-    console.log('estamos aqui index');
-    res.json({
-      res: 'tudo ok',
-    });
+  async index(req, res) {
+    try {
+      const response = await product.read();
+
+      if (response.lenght === 0) {
+        return res.status(404).json({
+          message: 'Nenhum produto encontrado.',
+        });
+      }
+
+      res.status(200).json({
+        message: 'Produtos encontrados com sucesso!',
+        data: response,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: error.message,
+        details: error.details,
+      });
+    }
   }
 
   async create(req, res) {
@@ -16,10 +31,15 @@ class ProductController {
         data: response,
       });
     } catch (error) {
-      console.error('Erro ao criar produto:', error);
-      res.status(500).json({
-        message: 'Erro ao criar produto.',
-        error: error.message,
+      if (error.type === 'validation') {
+        return res.status(400).json({
+          message: error.message,
+          details: error.details,
+        });
+      }
+      return res.status(500).json({
+        message: error.message,
+        details: error.details,
       });
     }
   }
