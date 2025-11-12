@@ -44,18 +44,53 @@ class ProductController {
     }
   }
 
-  update(req, res) {
-    console.log('estamos aqui update');
-    res.json({
-      res: 'tudo ok',
-    });
+  async update(req, res) {
+    try {
+      const { id } = req.params;
+      const response = await product.update(id, req.body);
+      res.status(200).json({
+        message: 'Produto editado com sucesso!',
+        data: response,
+      });
+    } catch (error) {
+      if (error.type === 'validation') {
+        return res.status(400).json({
+          message: error.message,
+          details: error.details,
+        });
+      }
+
+      if (error.type === 'not_found') {
+        return res.status(404).json({
+          message: error.message,
+        });
+      }
+
+      return res.status(500).json({
+        message: error.message || 'Erro interno no servidor.',
+        details: error.details,
+      });
+    }
   }
 
-  delete(req, res) {
-    console.log('estamos aqui delete');
-    res.json({
-      res: 'tudo ok',
-    });
+  async delete(req, res) {
+    try {
+      const { id } = req.params;
+      const response = await product.delete(id);
+
+      res.status(200).json({
+        message: 'Produto deletado com sucesso!',
+        data: response,
+      });
+    } catch (error) {
+      if (error.type === 'not_found') {
+        return res.status(404).json({ message: error.message });
+      }
+      return res.status(500).json({
+        message: error.message || 'Erro interno no servidor.',
+        details: error.details,
+      });
+    }
   }
 }
 
