@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prismaClient.js';
-import { formatProductData } from '../utils/formatData.js';
+import { formatProductData } from '../utils/formatProductData.js';
 import { productSchema } from '../schemas/product-schema.js';
 import { ZodError } from 'zod';
 
