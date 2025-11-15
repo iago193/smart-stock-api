@@ -1,6 +1,7 @@
 import express from 'express';
 import productRouter from './src/routes/product-router.js';
 import categoryRouter from './src/routes/category-router.js';
+import errorHandler from './src/error/ErrorHandler.js';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -9,6 +10,7 @@ class App {
     this.app = express();
     this.middlewares();
     this.routes();
+    this.errorHandler();
   }
 
   middlewares() {
@@ -19,6 +21,10 @@ class App {
   routes() {
     this.app.use('/products', productRouter);
     this.app.use('/category', categoryRouter);
+  }
+
+  errorHandler() {
+    this.app.use(errorHandler);
   }
 }
 

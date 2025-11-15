@@ -1,7 +1,7 @@
 import product from '../model/Product.js';
 
 class ProductController {
-  async index(req, res) {
+  async index(req, res, next) {
     try {
       const response = await product.read();
 
@@ -16,14 +16,11 @@ class ProductController {
         data: response,
       });
     } catch (error) {
-      res.status(500).json({
-        message: error.message,
-        details: error.details,
-      });
+      next(error);
     }
   }
 
-  async create(req, res) {
+  async create(req, res, next) {
     try {
       const response = await product.create(req.body);
       res.status(201).json({
@@ -31,20 +28,11 @@ class ProductController {
         data: response,
       });
     } catch (error) {
-      if (error.type === 'validation') {
-        return res.status(400).json({
-          message: error.message,
-          details: error.details,
-        });
-      }
-      return res.status(500).json({
-        message: error.message,
-        details: error.details,
-      });
+      next(error);
     }
   }
 
-  async update(req, res) {
+  async update(req, res, next) {
     try {
       const { id } = req.params;
       const response = await product.update(id, req.body);
@@ -53,27 +41,11 @@ class ProductController {
         data: response,
       });
     } catch (error) {
-      if (error.type === 'validation') {
-        return res.status(400).json({
-          message: error.message,
-          details: error.details,
-        });
-      }
-
-      if (error.type === 'not_found') {
-        return res.status(404).json({
-          message: error.message,
-        });
-      }
-
-      return res.status(500).json({
-        message: error.message || 'Erro interno no servidor.',
-        details: error.details,
-      });
+      next(error);
     }
   }
 
-  async delete(req, res) {
+  async delete(req, res, next) {
     try {
       const { id } = req.params;
       const response = await product.delete(id);
@@ -83,13 +55,7 @@ class ProductController {
         data: response,
       });
     } catch (error) {
-      if (error.type === 'not_found') {
-        return res.status(404).json({ message: error.message });
-      }
-      return res.status(500).json({
-        message: error.message || 'Erro interno no servidor.',
-        details: error.details,
-      });
+      next(error);
     }
   }
 }

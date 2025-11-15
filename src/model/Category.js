@@ -1,6 +1,7 @@
 import { prisma } from '../lib/prismaClient.js';
 import { formatCategoryData } from '../utils/formatCategoryData.js';
 import { categorySchema } from '../schemas/category-schema.js';
+import ApiError from '../error/ApiError.js';
 import { ZodError } from 'zod';
 
 class Category {
@@ -9,81 +10,58 @@ class Category {
       const categories = await prisma.categories.findMany({
         orderBy: { id: 'desc' },
       });
-
       return categories;
     } catch (error) {
-      throw {
-        type: 'internal',
-        message: 'Erro ao buscar categorias',
-        details: error.message || error,
-      };
+      throw ApiError.internal('Erro ao buscar categorias', error);
     }
   }
 
   async create(data) {
-    console.log('estamos aqui category create');
     try {
       const formatted = formatCategoryData(data);
       const validated = categorySchema.parse(formatted);
+
       const categoryCreate = await prisma.categories.create({ data: validated });
+
       return {
         id: categoryCreate.id,
         name: categoryCreate.name,
       };
     } catch (error) {
       if (error instanceof ZodError) {
-        throw {
-          type: 'validation',
-          message: 'Erro de validação nos dados do produto',
-          details: error.errors,
-        };
+        throw ApiError.badRequest('Erro de validação nos dados da categoria', error.errors);
       }
-      throw {
-        type: 'internal',
-        message: 'Erro interno ao criar produto.',
-        details: error,
-      };
+      throw ApiError.internal('Erro interno ao criar categoria.', error);
     }
   }
 
   async update(id, data) {
-    const formatted = formatCategoryData(data);
-    const validated = categorySchema.parse(formatted);
     try {
+      const formatted = formatCategoryData(data);
+      const validated = categorySchema.parse(formatted);
+
       const existing = await prisma.categories.findUnique({
         where: { id: Number(id) },
       });
 
       if (!existing) {
-        throw {
-          type: 'not_found',
-          message: 'Categoria não encontrada para atualização.',
-        };
+        throw ApiError.notFound('Categoria não encontrada para atualização.');
       }
 
-      const updateCategory = await prisma.categories.update({
+      const updated = await prisma.categories.update({
         where: { id: Number(id) },
         data: validated,
       });
 
       return {
-        id: updateCategory.id,
-        name: updateCategory.name,
+        id: updated.id,
+        name: updated.name,
       };
     } catch (error) {
       if (error instanceof ZodError) {
-        throw {
-          type: 'validation',
-          message: 'Erro de validação nos dados da Categoria.',
-          details: error.errors,
-        };
+        throw ApiError.badRequest('Erro de validação nos dados da categoria.', error.errors);
       }
-
-      throw {
-        type: 'internal',
-        message: 'Erro interno ao atualizar Categoria.',
-        details: error.message || error,
-      };
+      throw ApiError.internal('Erro interno ao atualizar categoria.', error);
     }
   }
 
@@ -94,30 +72,22 @@ class Category {
       });
 
       if (!existing) {
-        throw {
-          type: 'not_found',
-          message: 'Produto não encontrado.',
-        };
+        throw ApiError.notFound('Categoria não encontrada para deletar.');
       }
 
-      const categoryDeleted = prisma.categories.delete({
+      const deleted = await prisma.categories.delete({
         where: { id: Number(id) },
       });
 
       return {
-        id: categoryDeleted.id,
-        name: categoryDeleted.name,
+        id: deleted.id,
+        name: deleted.name,
       };
     } catch (error) {
-      if (error.type === 'not_found') {
+      if (error instanceof ApiError) {
         throw error;
       }
-
-      throw {
-        type: 'internal',
-        message: 'Erro interno ao deletar produto.',
-        details: error.message || error,
-      };
+      throw ApiError.internal('Erro interno ao deletar categoria.', error);
     }
   }
 }
