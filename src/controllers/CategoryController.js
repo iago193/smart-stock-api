@@ -1,4 +1,4 @@
-import category from '../model/Category.js';
+import category from '../services/CategoryService.js';
 
 class CategoryController {
   async index(req, res, next) {

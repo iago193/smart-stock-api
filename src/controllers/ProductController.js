@@ -1,4 +1,4 @@
-import product from '../model/Product.js';
+import product from '../services/ProductService.js';
 
 class ProductController {
   async index(req, res, next) {
@@ -21,6 +21,7 @@ class ProductController {
   }
 
   async create(req, res, next) {
+    console.log(req.body);
     try {
       const response = await product.create(req.body);
       res.status(201).json({
