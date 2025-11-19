@@ -9,6 +9,15 @@ class Product {
     try {
       const products = await prisma.products.findMany({
         orderBy: { id: 'desc' },
+        include: {
+          product_images: {
+            select: {
+              id: true,
+              url: true,
+              public_id: true,
+            },
+          },
+        },
       });
 
       return products;

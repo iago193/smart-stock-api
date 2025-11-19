@@ -1,38 +1,51 @@
 -- DATEBASE smart-stock
 
--- 1)
-CREATE TABLE IF NOT EXISTS categories (
-  id INT AUTO_INCREMENT PRIMARY KEY, -- Identificador único da categoria
-  name VARCHAR(100) NOT NULL,        -- Nome da categoria (ex: Eletrônicos, Roupas)
-  description TEXT,                  -- Descrição opcional da categoria
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP -- Data de criação do registro
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+CREATE TABLE categories (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(100) NOT NULL,
+  description TEXT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
--- 2)
-CREATE TABLE IF NOT EXISTS products (
-  id INT AUTO_INCREMENT PRIMARY KEY,                              -- Identificador único do produto
-  name VARCHAR(150) NOT NULL,                                     -- Nome do produto
-  description TEXT,                                               -- Descrição detalhada do produto
-  sku VARCHAR(50) UNIQUE,                                         -- Código interno (Stock Keeping Unit)
-  barcode VARCHAR(50),                                            -- Código de barras do produto
-  category_id INT,                                                -- ID da categoria (relacionamento com categories)
-  brand VARCHAR(100),                                             -- Marca do produto
-  price DECIMAL(10,2) NOT NULL,                                   -- Preço de venda
-  discount_price DECIMAL(10,2),                                   -- Preço com desconto (opcional)
-  stock INT NOT NULL DEFAULT 0,                                   -- Quantidade disponível em estoque
-  weight DECIMAL(10,3),                                           -- Peso do produto (kg)
-  width DECIMAL(10,2),                                            -- Largura (cm)
-  height DECIMAL(10,2),                                           -- Altura (cm)
-  length DECIMAL(10,2),                                           -- Comprimento (cm)
-  image_url VARCHAR(255),                                         -- URL da imagem principal do produto
-  is_active TINYINT(1) DEFAULT 1,                                 -- Status do produto (1 = ativo, 0 = inativo)
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,                  -- Data de criação do produto
-  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- Data da última atualização
-  INDEX idx_products_name (name),                                 -- Índice para otimizar buscas por nome
-  INDEX idx_products_category (category_id),                      -- Índice para buscas por categoria
-  INDEX idx_products_barcode (barcode),                           -- Índice para buscas por código de barras
-  CONSTRAINT fk_products_category FOREIGN KEY (category_id)       -- Chave estrangeira que conecta à tabela categories
+CREATE TABLE products (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(150) NOT NULL,
+  description TEXT NULL,
+  sku VARCHAR(50) UNIQUE,
+  barcode VARCHAR(50),
+  category_id INT NULL,
+  brand VARCHAR(100),
+  price DECIMAL(10,2) NOT NULL,
+  discount_price DECIMAL(10,2),
+  stock INT DEFAULT 0,
+  weight DECIMAL(10,3),
+  width DECIMAL(10,2),
+  height DECIMAL(10,2),
+  length DECIMAL(10,2),
+  is_active BOOLEAN DEFAULT TRUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_products_category FOREIGN KEY (category_id)
     REFERENCES categories(id)
     ON DELETE SET NULL
     ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+);
+
+CREATE TABLE product_images (
+  id INT AUTO_INCREMENT PRIMARY KEY,
+  product_id INT NOT NULL,
+  url VARCHAR(255) UNIQUE NOT NULL,
+  public_id VARCHAR(255) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT product_images_products_FK FOREIGN KEY (product_id)
+    REFERENCES products(id)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+CREATE INDEX idx_products_category ON products(category_id);
+CREATE INDEX idx_products_name ON products(name);
+CREATE INDEX idx_products_barcode ON products(barcode);
+CREATE INDEX idx_product_images_product_id ON product_images(product_id);
+
+
