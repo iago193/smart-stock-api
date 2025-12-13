@@ -25,76 +25,59 @@ function cleanNumber(v, fieldName) {
   return n;
 }
 
+function cleanOptionalNumber(v, fieldName) {
+  if (v === undefined || v === null || v === '') return null;
+  return cleanNumber(v, fieldName);
+}
+
 function cleanBoolean(v, fieldName) {
   if (v === true || v === 'true') return true;
   if (v === false || v === 'false') return false;
 
-  throw ApiError.badRequest(`${fieldName} deve ser um boolean válido (true/false).`, {
+  throw ApiError.badRequest(`${fieldName} deve ser boolean (true/false).`, {
     field: fieldName,
     value: v,
   });
 }
 
 export function formatProductData(data = {}) {
+  // strings
   const name = cleanString(data.name);
-  const desc = cleanString(data.description);
-
+  const description = cleanString(data.description);
   const sku = cleanString(data.sku);
   const barcode = cleanString(data.barcode);
   const brand = cleanString(data.brand);
 
-  // --- VALIDAÇÕES COM ERRO ---
+  // validações obrigatórias
+  expectRange(name, 3, 150, 'name');
 
-  // NAME: 3–100 chars
-  expectRange(name, 3, 100, 'name');
+  // opcionais (só valida se vierem)
+  if (description) expectRange(description, 1, 1000, 'description');
+  if (sku) expectRange(sku, 3, 50, 'sku');
+  if (barcode) expectRange(barcode, 3, 50, 'barcode');
+  if (brand) expectRange(brand, 2, 50, 'brand');
 
-  // DESCRIPTION: obrigatório
-  if (desc === '') {
-    throw ApiError.badRequest('description não pode ser vazia.', {
-      field: 'description',
-    });
-  }
-
-  // SKU: 3–50 chars
-  expectRange(sku, 3, 50, 'sku');
-
-  // BARCODE: 3–50 chars
-  expectRange(barcode, 3, 50, 'barcode');
-
-  // CATEGORY_ID: precisa ser número válido
-  const category_id = cleanNumber(data.category_id, 'category_id');
-
-  // brand 2–50 chars
-  expectRange(brand, 2, 50, 'brand');
-
-  // price
+  // números
   const price = cleanNumber(data.price, 'price');
+  const stock = cleanOptionalNumber(data.stock, 'stock') ?? 0;
 
-  // discount_price opcional — se vier vazio, não erro
-  const discount_price =
-    data.discount_price === undefined || data.discount_price === null || data.discount_price === ''
-      ? null
-      : cleanNumber(data.discount_price, 'discount_price');
+  const discount_price = cleanOptionalNumber(data.discount_price, 'discount_price');
+  const category_id = cleanOptionalNumber(data.category_id, 'category_id');
 
-  // stock
-  const stock = cleanNumber(data.stock, 'stock');
+  const weight = cleanOptionalNumber(data.weight, 'weight');
+  const width = cleanOptionalNumber(data.width, 'width');
+  const height = cleanOptionalNumber(data.height, 'height');
+  const length = cleanOptionalNumber(data.length, 'length');
 
-  // medidas
-  const weight = cleanNumber(data.weight, 'weight');
-  const width = cleanNumber(data.width, 'width');
-  const height = cleanNumber(data.height, 'height');
-  const length = cleanNumber(data.length, 'length');
-
-  // boolean
-  const is_active = cleanBoolean(data.is_active, 'is_active');
+  const is_active = data.is_active === undefined ? true : cleanBoolean(data.is_active, 'is_active');
 
   return {
     name,
-    description: desc,
-    sku,
-    barcode,
+    description: description || null,
+    sku: sku || null,
+    barcode: barcode || null,
     category_id,
-    brand,
+    brand: brand || null,
     price,
     discount_price,
     stock,

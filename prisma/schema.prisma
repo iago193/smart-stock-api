@@ -7,80 +7,86 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model categories {
-  id          Int        @id @default(autoincrement())
-  name        String     @db.VarChar(100)
-  description String?    @db.Text
-  created_at  DateTime?  @default(now()) @db.DateTime(0)
-  products    products[]
+model Category {
+  id          Int       @id @default(autoincrement())
+  name        String    @db.VarChar(100)
+  description String?   @db.Text
+  created_at  DateTime? @default(now()) @db.DateTime(0)
+  products    Product[]
+
+  @@map("categories")
 }
 
-model product_images {
+model Product {
+  id             Int            @id @default(autoincrement())
+  name           String         @db.VarChar(150)
+  description    String?        @db.Text
+  sku            String?        @unique(map: "sku") @db.VarChar(50)
+  barcode        String?        @db.VarChar(50)
+  category_id    Int?
+  brand          String?        @db.VarChar(100)
+  price          Decimal        @db.Decimal(10, 2)
+  discount_price Decimal?       @db.Decimal(10, 2)
+  stock          Int?           @default(0)
+  weight         Decimal?       @db.Decimal(10, 3)
+  width          Decimal?       @db.Decimal(10, 2)
+  height         Decimal?       @db.Decimal(10, 2)
+  length         Decimal?       @db.Decimal(10, 2)
+  is_active      Boolean?       @default(true)
+  created_at     DateTime?      @default(now()) @db.DateTime(0)
+  updated_at     DateTime?      @default(now()) @updatedAt @db.DateTime(0)
+  images         ProductImage[]
+  category       Category?      @relation(fields: [category_id], references: [id], map: "fk_products_category")
+
+  @@index([category_id], map: "fk_products_category")
+  @@map("products")
+}
+
+model ProductImage {
   id         Int       @id @default(autoincrement())
   product_id Int
   url        String    @unique(map: "url") @db.VarChar(255)
   public_id  String    @db.VarChar(255)
   created_at DateTime? @default(now()) @db.DateTime(0)
-  products   products  @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "product_images_products_FK")
+  product    Product   @relation(fields: [product_id], references: [id], onDelete: Cascade, map: "product_images_products_FK")
 
   @@index([product_id], map: "idx_product_images_product_id")
+  @@map("product_images")
 }
 
-model products {
-  id             Int              @id @default(autoincrement())
-  name           String           @db.VarChar(150)
-  description    String?          @db.Text
-  sku            String?          @unique(map: "sku") @db.VarChar(50)
-  barcode        String?          @db.VarChar(50)
-  category_id    Int?
-  brand          String?          @db.VarChar(100)
-  price          Decimal          @db.Decimal(10, 2)
-  discount_price Decimal?         @db.Decimal(10, 2)
-  stock          Int?             @default(0)
-  weight         Decimal?         @db.Decimal(10, 3)
-  width          Decimal?         @db.Decimal(10, 2)
-  height         Decimal?         @db.Decimal(10, 2)
-  length         Decimal?         @db.Decimal(10, 2)
-  is_active      Boolean?         @default(true)
-  created_at     DateTime?        @default(now()) @db.DateTime(0)
-  updated_at     DateTime?        @default(now()) @db.DateTime(0)
-  product_images product_images[]
-  categories     categories?      @relation(fields: [category_id], references: [id], map: "fk_products_category")
-
-  @@index([category_id], map: "fk_products_category")
-}
-
-model roles {
+model Role {
   id          Int     @id @default(autoincrement())
   name        String  @unique @db.VarChar(100)
   description String? @db.Text
-  users       users[]
+  users       User[]
+
+  @@map("roles")
 }
 
-model user_images {
+model User {
+  id            Int         @id @default(autoincrement())
+  first_name    String      @db.VarChar(100)
+  last_name     String      @db.VarChar(100)
+  email         String      @unique @db.VarChar(255)
+  created_at    DateTime    @default(now()) @db.DateTime(0)
+  updated_at    DateTime    @default(now()) @updatedAt @db.DateTime(0)
+  role_id       Int?
+  password_hash String      @db.VarChar(255)
+  images        UserImage[]
+  role          Role?       @relation(fields: [role_id], references: [id], map: "fk_users_role")
+
+  @@index([role_id], map: "idx_users_role")
+  @@map("users")
+}
+
+model UserImage {
   id         Int       @id @default(autoincrement())
   user_id    Int
   url        String    @unique @db.VarChar(255)
   public_id  String    @db.VarChar(255)
   created_at DateTime? @default(now()) @db.DateTime(0)
-  user       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_images_users_FK")
+  user       User      @relation(fields: [user_id], references: [id], onDelete: Cascade, map: "user_images_users_FK")
 
   @@index([user_id], map: "idx_user_images_user_id")
+  @@map("user_images")
 }
-
-model users {
-  id            Int        @id @default(autoincrement())
-  first_name    String     @db.VarChar(100)
-  last_name     String     @db.VarChar(100)
-  email         String     @unique @db.VarChar(255)
-  created_at    DateTime   @default(now()) @db.DateTime(0)
-  updated_at    DateTime   @default(now()) @db.DateTime(0)
-  role_id       Int?
-  password_hash String      @unique @db.VarChar(255)
-
-  role          roles?      @relation(fields: [role_id], references: [id], map: "fk_users_role")
-  user_images   user_images[]
-
-  @@index([role_id], map: "idx_users_role")
-}
-

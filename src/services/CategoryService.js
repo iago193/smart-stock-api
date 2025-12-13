@@ -7,7 +7,7 @@ import { ZodError } from 'zod';
 class Category {
   async read() {
     try {
-      const categories = await prisma.categories.findMany({
+      const categories = await prisma.category.findMany({
         orderBy: { id: 'desc' },
       });
       return categories;
@@ -21,7 +21,7 @@ class Category {
       const formatted = formatCategoryData(data);
       const validated = categorySchema.parse(formatted);
 
-      const categoryCreate = await prisma.categories.create({ data: validated });
+      const categoryCreate = await prisma.category.create({ data: validated });
 
       return {
         id: categoryCreate.id,
@@ -40,7 +40,7 @@ class Category {
       const formatted = formatCategoryData(data);
       const validated = categorySchema.parse(formatted);
 
-      const existing = await prisma.categories.findUnique({
+      const existing = await prisma.category.findUnique({
         where: { id: Number(id) },
       });
 
@@ -48,7 +48,7 @@ class Category {
         throw ApiError.notFound('Categoria não encontrada para atualização.');
       }
 
-      const updated = await prisma.categories.update({
+      const updated = await prisma.category.update({
         where: { id: Number(id) },
         data: validated,
       });
@@ -67,7 +67,7 @@ class Category {
 
   async delete(id) {
     try {
-      const existing = await prisma.categories.findUnique({
+      const existing = await prisma.category.findUnique({
         where: { id: Number(id) },
       });
 
@@ -75,7 +75,7 @@ class Category {
         throw ApiError.notFound('Categoria não encontrada para deletar.');
       }
 
-      const deleted = await prisma.categories.delete({
+      const deleted = await prisma.category.delete({
         where: { id: Number(id) },
       });
 

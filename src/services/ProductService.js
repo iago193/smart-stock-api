@@ -7,7 +7,7 @@ import { ZodError } from 'zod';
 class Product {
   async read() {
     try {
-      const products = await prisma.products.findMany({
+      const products = await prisma.product.findMany({
         orderBy: { id: 'desc' },
         include: {
           product_images: {
@@ -31,7 +31,7 @@ class Product {
       const formatted = formatProductData(data);
       const validated = productSchema.parse(formatted);
 
-      const productCreate = await prisma.products.create({ data: validated });
+      const productCreate = await prisma.product.create({ data: validated });
 
       return {
         id: productCreate.id,
@@ -51,7 +51,7 @@ class Product {
       const formatted = formatProductData(data);
       const validated = productSchema.partial().parse(formatted);
 
-      const existing = await prisma.products.findUnique({
+      const existing = await prisma.product.findUnique({
         where: { id: Number(id) },
       });
 
@@ -59,7 +59,7 @@ class Product {
         throw ApiError.notFound('Produto não encontrado para atualização.');
       }
 
-      const updateProduct = await prisma.products.update({
+      const updateProduct = await prisma.product.update({
         where: { id: Number(id) },
         data: validated,
       });
@@ -79,7 +79,7 @@ class Product {
 
   async delete(id) {
     try {
-      const productExisting = await prisma.products.findUnique({
+      const productExisting = await prisma.product.findUnique({
         where: { id: Number(id) },
       });
 
@@ -87,7 +87,7 @@ class Product {
         throw ApiError.notFound('Produto não encontrado para deletar.');
       }
 
-      const producTeleted = await prisma.products.delete({
+      const producTeleted = await prisma.product.delete({
         where: { id: Number(id) },
       });
 

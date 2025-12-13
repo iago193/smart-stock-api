@@ -7,7 +7,7 @@ class UploadService {
     try {
       const productId = Number(id);
 
-      const existing = await prisma.products.findUnique({
+      const existing = await prisma.product.findUnique({
         where: { id: productId },
       });
 
@@ -24,7 +24,7 @@ class UploadService {
           .end(file.buffer);
       });
 
-      const createdImage = await prisma.product_images.create({
+      const createdImage = await prisma.productImage.create({
         data: {
           product_id: productId,
           url: uploadResult.secure_url,
