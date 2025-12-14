@@ -1,29 +1,23 @@
 import { prisma } from '../lib/prismaClient.js';
 import { formatProductData } from '../formatters/formatProductData.js';
 import { productSchema } from '../schemas/product-schema.js';
-import ApiError from '../error/ApiError.js';
+import ApiError from '../errors/ApiError.js';
 import { ZodError } from 'zod';
 
-class Product {
+class ProductService {
   async read() {
-    try {
-      const products = await prisma.product.findMany({
-        orderBy: { id: 'desc' },
-        include: {
-          product_images: {
-            select: {
-              id: true,
-              url: true,
-              public_id: true,
-            },
+    return prisma.product.findMany({
+      orderBy: { id: 'desc' },
+      include: {
+        product_images: {
+          select: {
+            id: true,
+            url: true,
+            public_id: true,
           },
         },
-      });
-
-      return products;
-    } catch (error) {
-      throw ApiError.internal('Erro ao buscar produtos.', error);
-    }
+      },
+    });
   }
 
   async create(data) {
@@ -31,18 +25,20 @@ class Product {
       const formatted = formatProductData(data);
       const validated = productSchema.parse(formatted);
 
-      const productCreate = await prisma.product.create({ data: validated });
+      const product = await prisma.product.create({
+        data: validated,
+      });
 
       return {
-        id: productCreate.id,
-        name: productCreate.name,
+        id: product.id,
+        name: product.name,
       };
     } catch (error) {
       if (error instanceof ZodError) {
-        throw ApiError.badRequest('Erro de validação nos dados do produto', error.errors);
+        throw ApiError.badRequest('Erro de validação nos dados do produto.', error.errors);
       }
 
-      throw ApiError.internal('Erro interno ao criar produto.', error);
+      throw error;
     }
   }
 
@@ -59,50 +55,46 @@ class Product {
         throw ApiError.notFound('Produto não encontrado para atualização.');
       }
 
-      const updateProduct = await prisma.product.update({
+      const product = await prisma.product.update({
         where: { id: Number(id) },
         data: validated,
       });
 
       return {
-        id: updateProduct.id,
-        name: updateProduct.name,
+        id: product.id,
+        name: product.name,
       };
     } catch (error) {
       if (error instanceof ZodError) {
         throw ApiError.badRequest('Erro de validação nos dados do produto.', error.errors);
       }
 
-      throw ApiError.internal('Erro interno ao atualizar produto.', error);
-    }
-  }
-
-  async delete(id) {
-    try {
-      const productExisting = await prisma.product.findUnique({
-        where: { id: Number(id) },
-      });
-
-      if (!productExisting) {
-        throw ApiError.notFound('Produto não encontrado para deletar.');
-      }
-
-      const producTeleted = await prisma.product.delete({
-        where: { id: Number(id) },
-      });
-
-      return {
-        id: producTeleted.id,
-        name: producTeleted.name,
-      };
-    } catch (error) {
       if (error instanceof ApiError) {
         throw error;
       }
 
-      throw ApiError.internal('Erro interno ao deletar produto.', error);
+      throw error;
     }
+  }
+
+  async delete(id) {
+    const existing = await prisma.product.findUnique({
+      where: { id: Number(id) },
+    });
+
+    if (!existing) {
+      throw ApiError.notFound('Produto não encontrado para deletar.');
+    }
+
+    const product = await prisma.product.delete({
+      where: { id: Number(id) },
+    });
+
+    return {
+      id: product.id,
+      name: product.name,
+    };
   }
 }
 
-export default new Product();
+export default new ProductService();

@@ -1,4 +1,4 @@
-import ApiError from '../error/ApiError.js';
+import ApiError from '../errors/ApiError.js';
 
 function cleanString(v) {
   return typeof v === 'string' ? v.trim() : '';

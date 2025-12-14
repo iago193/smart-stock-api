@@ -5,7 +5,7 @@ class ProductController {
     try {
       const response = await product.read();
 
-      if (response.lenght === 0) {
+      if (response.length === 0) {
         return res.status(404).json({
           message: 'Nenhum produto encontrado.',
         });
@@ -21,7 +21,6 @@ class ProductController {
   }
 
   async create(req, res, next) {
-    console.log(req.body);
     try {
       const response = await product.create(req.body);
       res.status(201).json({

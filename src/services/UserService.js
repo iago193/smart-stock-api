@@ -1,11 +1,11 @@
 import { prisma } from '../lib/prismaClient.js';
 import { formatUserData } from '../formatters/formatUserData.js';
 import { userSchema } from '../schemas/user-schema.js';
-import ApiError from '../error/ApiError.js';
+import ApiError from '../errors/ApiError.js';
 import { ZodError } from 'zod';
 import bcrypt from 'bcrypt';
 
-class User {
+class UserService {
   read() {
     console.log('estamos aqui product read');
   }
@@ -41,4 +41,4 @@ class User {
   }
 }
 
-export default new User();
+export default new UserService();

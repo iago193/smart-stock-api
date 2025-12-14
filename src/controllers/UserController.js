@@ -1,8 +1,9 @@
 import User from '../services/UserService.js';
 
 class UserController {
-  index() {
+  index(req, res) {
     console.log('estamos aqui index');
+    res.status(200).json('estamos aqui index');
   }
 
   async create(req, res, next) {
