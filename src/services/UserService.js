@@ -21,6 +21,7 @@ class UserService {
           first_name: validated.first_name,
           last_name: validated.last_name,
           email: validated.email,
+          role_id: validated.role_id,
           password_hash,
         },
       });

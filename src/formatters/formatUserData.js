@@ -45,6 +45,9 @@ export function formatUserData(data = {}) {
   const email = cleanString(data.email);
   const password = cleanString(data.password);
 
+  // role_id
+  const role_id = data.role_id !== undefined ? Number(data.role_id) : undefined;
+
   // first_name
   expectRange(first_name, 3, 50, 'first_name');
 
@@ -54,10 +57,18 @@ export function formatUserData(data = {}) {
   // email
   validateEmailOrFail(email);
 
-  // password (PLAIN TEXT)
+  // password
   if (!password || password.length < 6) {
     throw ApiError.badRequest(`password deve ter pelo menos 6 caracteres.`, {
       field: 'password',
+    });
+  }
+
+  // role_id validation
+  if (role_id !== undefined && (Number.isNaN(role_id) || role_id <= 0)) {
+    throw ApiError.badRequest(`role_id inválido.`, {
+      field: 'role_id',
+      value: data.role_id,
     });
   }
 
@@ -66,5 +77,6 @@ export function formatUserData(data = {}) {
     last_name,
     email,
     password,
+    role_id,
   };
 }
