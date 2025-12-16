@@ -11,8 +11,12 @@ class CategoryService {
     });
   }
 
-  async create(data) {
+  async create(data, role) {
     try {
+      if (role !== 'admin') {
+        throw ApiError.unauthorized('Você não tem autorização para criar categorias.');
+      }
+
       const formatted = formatCategoryData(data);
       const validated = categorySchema.parse(formatted);
 
@@ -29,12 +33,20 @@ class CategoryService {
         throw ApiError.badRequest('Erro de validação nos dados da categoria.', error.errors);
       }
 
-      throw error;
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      throw ApiError.internal('Erro interno ao criar categoria.');
     }
   }
 
-  async update(id, data) {
+  async update(id, data, role) {
     try {
+      if (role !== 'admin') {
+        throw ApiError.unauthorized('Você não tem autorização para atualizar categorias.');
+      }
+
       const formatted = formatCategoryData(data);
       const validated = categorySchema.partial().parse(formatted);
 
@@ -64,11 +76,15 @@ class CategoryService {
         throw error;
       }
 
-      throw error;
+      throw ApiError.internal('Erro interno ao atualizar categoria.');
     }
   }
 
-  async delete(id) {
+  async delete(id, role) {
+    if (role !== 'admin') {
+      throw ApiError.unauthorized('Você não tem autorização para deletar categorias.');
+    }
+
     const existing = await prisma.category.findUnique({
       where: { id: Number(id) },
     });

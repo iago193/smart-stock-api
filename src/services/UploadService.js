@@ -3,8 +3,13 @@ import cloudinary from '../lib/cloudinary.js';
 import { prisma } from '../lib/prismaClient.js';
 
 class UploadService {
-  async uploadImage(file, id) {
+  async uploadImage(file, id, userRole) {
     const productId = Number(id);
+
+    // Valida se o ID é um número válido
+    if (Number.isNaN(productId) || productId <= 0) {
+      throw ApiError.badRequest('ID do produto inválido.');
+    }
 
     const existing = await prisma.product.findUnique({
       where: { id: productId },
@@ -12,6 +17,11 @@ class UploadService {
 
     if (!existing) {
       throw ApiError.notFound('Produto não encontrado');
+    }
+
+    // Apenas admin pode fazer upload (ou você pode remover isso se qualquer usuário autenticado pode)
+    if (userRole !== 'admin') {
+      throw ApiError.unauthorized('Você não tem permissão para fazer upload de imagens.');
     }
 
     let uploadResult;
@@ -25,8 +35,8 @@ class UploadService {
           })
           .end(file.buffer);
       });
-    } catch (error) {
-      throw ApiError.internal('Erro ao enviar imagem para o Cloudinary.', error);
+    } catch {
+      throw ApiError.internal('Erro ao enviar imagem para o Cloudinary.');
     }
 
     const createdImage = await prisma.productImage.create({

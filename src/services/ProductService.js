@@ -20,8 +20,12 @@ class ProductService {
     });
   }
 
-  async create(data) {
+  async create(data, role) {
     try {
+      if (role !== 'admin') {
+        throw ApiError.unauthorized('Você não tem autorização para criar produtos.');
+      }
+
       const formatted = formatProductData(data);
       const validated = productSchema.parse(formatted);
 
@@ -38,12 +42,20 @@ class ProductService {
         throw ApiError.badRequest('Erro de validação nos dados do produto.', error.errors);
       }
 
-      throw error;
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      throw ApiError.internal('Erro interno ao criar produto.');
     }
   }
 
-  async update(id, data) {
+  async update(id, data, role) {
     try {
+      if (role !== 'admin') {
+        throw ApiError.unauthorized('Você não tem autorização para atualizar produtos.');
+      }
+
       const formatted = formatProductData(data);
       const validated = productSchema.partial().parse(formatted);
 
@@ -73,11 +85,15 @@ class ProductService {
         throw error;
       }
 
-      throw error;
+      throw ApiError.internal('Erro interno ao atualizar produto.');
     }
   }
 
-  async delete(id) {
+  async delete(id, role) {
+    if (role !== 'admin') {
+      throw ApiError.unauthorized('Você não tem autorização para deletar produtos.');
+    }
+
     const existing = await prisma.product.findUnique({
       where: { id: Number(id) },
     });

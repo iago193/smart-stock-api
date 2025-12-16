@@ -5,10 +5,24 @@ const authMiddleware = (req, res, next) => {
   const authHeader = req.headers.authorization;
 
   if (!authHeader) {
-    throw ApiError.unauthorized('Token não fornecido.');
+    return next(ApiError.unauthorized('Token não fornecido.'));
   }
 
-  const [, token] = authHeader.split(' ');
+  const parts = authHeader.split(' ');
+
+  if (parts.length !== 2 || parts[0] !== 'Bearer') {
+    return next(ApiError.unauthorized('Formato de token inválido. Use: Bearer <token>'));
+  }
+
+  const token = parts[1];
+
+  if (!token) {
+    return next(ApiError.unauthorized('Token não fornecido.'));
+  }
+
+  if (!process.env.JWT_SECRET) {
+    return next(ApiError.internal('JWT_SECRET não configurado.'));
+  }
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -20,10 +34,9 @@ const authMiddleware = (req, res, next) => {
     };
 
     next();
-  } catch (err) {
-    console.log(err);
-    throw ApiError.unauthorized('Token inválido ou expirado.');
+  } catch {
+    return next(ApiError.unauthorized('Token inválido ou expirado.'));
   }
 };
 
-export default authMiddleware();
+export default authMiddleware;

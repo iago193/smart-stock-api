@@ -16,9 +16,5 @@ export default function errorHandler(err, req, res, next) {
   // Erro genérico
   return res.status(500).json({
     message: 'Erro interno no servidor.',
-    data: {
-      code: err.code ?? 'INTERNAL_SERVER_ERROR',
-      meta: err.meta ?? null,
-    },
   });
 }

@@ -1,9 +1,14 @@
 import User from '../services/UserService.js';
 
 class UserController {
-  index(req, res) {
-    console.log('estamos aqui index');
-    res.status(200).json('estamos aqui index');
+  async index(req, res, next) {
+    try {
+      const id = Number(req.user.id);
+      const response = await User.read(id);
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
   }
 
   async create(req, res, next) {
@@ -15,12 +20,29 @@ class UserController {
     }
   }
 
-  update() {
-    console.log('estamos aqui update');
+  async update(req, res, next) {
+    try {
+      const { id } = req.params;
+      const role = req.user.role;
+      const response = await User.update(req.body, id, role);
+      res.status(200).json({
+        message: 'Usuário atualizado com sucesso!',
+        data: response,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  delete() {
-    console.log('estamos aqui delete');
+  async delete(req, res, next) {
+    try {
+      const { id } = req.params;
+      const role = req.user?.role;
+      const response = await User.delete(id, role);
+      res.status(200).json(response);
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

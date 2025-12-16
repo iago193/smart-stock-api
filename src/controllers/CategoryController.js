@@ -22,7 +22,8 @@ class CategoryController {
 
   async create(req, res, next) {
     try {
-      const response = await category.create(req.body);
+      const role = req.user?.role;
+      const response = await category.create(req.body, role);
       res.status(200).json({
         message: 'Categoria criada com sucesso!',
         data: response,
@@ -35,7 +36,8 @@ class CategoryController {
   async update(req, res, next) {
     try {
       const { id } = req.params;
-      const response = await category.update(id, req.body);
+      const role = req.user?.role;
+      const response = await category.update(id, req.body, role);
       return res.status(200).json({
         message: 'Categoria editada com sucesso!.',
         data: response,
@@ -48,7 +50,8 @@ class CategoryController {
   async delete(req, res, next) {
     const { id } = req.params;
     try {
-      const response = await category.delete(id);
+      const role = req.user?.role;
+      const response = await category.delete(id, role);
       return res.status(200).json({
         message: 'Categoria deletada com sucesso!.',
         data: response,

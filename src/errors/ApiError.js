@@ -22,6 +22,10 @@ export default class ApiError extends Error {
     return new ApiError(404, message);
   }
 
+  static tooManyRequests(message = 'Muitas requisições. Tente novamente mais tarde.') {
+    return new ApiError(429, message);
+  }
+
   static internal(message = 'Erro interno do servidor.', details = null) {
     return new ApiError(500, message, details);
   }

@@ -12,11 +12,18 @@ class TokenService {
       },
     });
 
-    const passwordIsValid = await bcrypt.compare(password, user.password_hash);
+    // Dummy hash para prevenir timing attacks
+    const dummyHash = '$2b$10$dummyHashToPreventTimingAttack1234567890123456789012';
+    const hashToCompare = user?.password_hash || dummyHash;
 
-    if (!passwordIsValid) {
-      console.log('inválido!');
+    const passwordIsValid = await bcrypt.compare(password, hashToCompare);
+
+    if (!user || !passwordIsValid) {
       throw ApiError.unauthorized('Credenciais inválidas.');
+    }
+
+    if (!user.role) {
+      throw ApiError.unauthorized('Usuário sem permissão configurada.');
     }
 
     const token = generateToken({
@@ -24,10 +31,6 @@ class TokenService {
       email: user.email,
       role: user.role.name,
     });
-
-    if (!user) {
-      throw ApiError.notFound('Usuário não encontrad.');
-    }
 
     return token;
   }
