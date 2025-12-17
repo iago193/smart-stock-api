@@ -2,40 +2,30 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 async function main() {
-  // ---- ROLES ----
   const roles = [
-    {
-      name: 'dono',
-      description: 'Acesso total ao sistema',
-    },
-    {
-      name: 'gerente',
-      description: 'Gerencia produtos e usuários, mas sem acesso total',
-    },
-    {
-      name: 'caixa',
-      description: 'Acesso ao módulo de vendas',
-    },
-    {
-      name: 'estoque',
-      description: 'Gerencia entradas e saídas de estoque',
-    },
+    { name: 'owner', description: 'Acesso total ao sistema' },
+    { name: 'manager', description: 'Gerencia produtos e usuários, mas sem acesso total' },
+    { name: 'box', description: 'Acesso ao módulo de vendas' },
+    { name: 'stock', description: 'Gerencia entradas e saídas de estoque' },
   ];
 
   for (const role of roles) {
-    await prisma.roles.upsert({
+    await prisma.role.upsert({
       where: { name: role.name },
       update: {},
       create: role,
     });
   }
+
   console.log('✔ Roles inseridos com sucesso!');
 }
 
 main()
   .then(() => prisma.$disconnect())
-  .catch(e => {
-    console.error(e);
+  .catch(err => {
+    console.error(err);
     prisma.$disconnect();
     process.exit(1);
   });
+
+//npx prisma db seed

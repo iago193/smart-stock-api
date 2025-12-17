@@ -6,8 +6,7 @@ class UploadService {
   async uploadImage(file, id, userRole) {
     const productId = Number(id);
 
-    // Valida se o ID é um número válido
-    if (Number.isNaN(productId) || productId <= 0) {
+    if (Number.isNaN(productId) && productId <= 0) {
       throw ApiError.badRequest('ID do produto inválido.');
     }
 
@@ -19,8 +18,7 @@ class UploadService {
       throw ApiError.notFound('Produto não encontrado');
     }
 
-    // Apenas admin pode fazer upload (ou você pode remover isso se qualquer usuário autenticado pode)
-    if (userRole !== 'admin') {
+    if (userRole !== 'owner' && userRole !== 'manager' && userRole !== 'stock') {
       throw ApiError.unauthorized('Você não tem permissão para fazer upload de imagens.');
     }
 

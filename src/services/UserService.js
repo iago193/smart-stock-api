@@ -6,11 +6,14 @@ import { userUpdateSchema } from '../schemas/user-schema.js';
 import ApiError from '../errors/ApiError.js';
 import { ZodError } from 'zod';
 import bcrypt from 'bcrypt';
+import cloudinary from '../lib/cloudinary.js';
 
 class UserService {
-  async read(id) {
-    const user = await prisma.user.findUnique({
-      where: { id: id },
+  async read(role) {
+    if (role !== 'owner' && role !== 'manager')
+      throw ApiError.unauthorized('Você não tem autorização para fazer isso!.');
+
+    const user = await prisma.user.findMany({
       include: {
         role: true,
       },
@@ -21,8 +24,11 @@ class UserService {
     }
     return user;
   }
-  async create(data) {
+  async create(data, role) {
     try {
+      if (role !== 'owner' && role !== 'manager')
+        throw ApiError.unauthorized('Você não tem autorização para fazer isso!.');
+
       const formatted = formatUserData(data);
       const validated = userSchema.parse(formatted);
 
@@ -57,7 +63,7 @@ class UserService {
   }
   async update(data, id, role) {
     try {
-      if (role !== 'admin')
+      if (role !== 'owner' && role !== 'manager')
         throw ApiError.unauthorized('Você não tem autorização para fazer isso!.');
 
       const userExisting = await prisma.user.findUnique({
@@ -88,7 +94,7 @@ class UserService {
         updateData.role_id = validated.role_id;
       }
 
-      // Se password foi fornecido, hash ele
+      // Se password foi fornecido, hash
       if (validated.password !== undefined) {
         updateData.password_hash = await bcrypt.hash(validated.password, 10);
       }
@@ -115,32 +121,64 @@ class UserService {
       throw ApiError.internal('Erro interno ao atualizar usuário.');
     }
   }
-  async delete(id, role) {
+  async delete(id, role, currentUserId) {
     try {
-      if (role !== 'admin') {
+      if (!['owner', 'manager'].includes(role)) {
         throw ApiError.unauthorized('Você não tem autorização para deletar usuários.');
       }
 
+      const userId = Number(id);
+      if (Number.isNaN(userId) || userId <= 0) {
+        throw ApiError.badRequest('ID do usuário inválido.');
+      }
+
       const userExisting = await prisma.user.findUnique({
-        where: { id: Number(id) },
+        where: { id: userId },
+        include: {
+          role: true,
+          images: {
+            select: {
+              id: true,
+              public_id: true,
+            },
+          },
+        },
       });
 
       if (!userExisting) {
         throw ApiError.notFound('Usuário não encontrado.');
       }
 
-      await prisma.user.delete({
-        where: { id: Number(id) },
-      });
-
-      return {
-        message: 'Usuário deletado com sucesso.',
-      };
-    } catch (error) {
-      if (error instanceof ApiError) {
-        throw error;
+      if (currentUserId && userExisting.id === Number(currentUserId)) {
+        throw ApiError.unauthorized('Você não pode excluir seu próprio usuário.');
       }
 
+      if (userExisting.role && userExisting.role.name === 'owner' && role !== 'owner') {
+        throw ApiError.unauthorized('Você não tem autorização para deletar esse usuário.');
+      }
+
+      // Deleta as imagens do Cloudinary antes de deletar o usuário
+      if (userExisting.images && userExisting.images.length > 0) {
+        const deletePromises = userExisting.images.map(image =>
+          cloudinary.uploader.destroy(image.public_id).catch(error => {
+            // Log do erro mas não impede a deleção do usuário
+            console.error(
+              `Erro ao deletar imagem do Cloudinary (public_id: ${image.public_id}):`,
+              error
+            );
+          })
+        );
+
+        await Promise.all(deletePromises);
+      }
+
+      await prisma.user.delete({
+        where: { id: userId },
+      });
+
+      return { message: 'Usuário deletado com sucesso.' };
+    } catch (error) {
+      if (error instanceof ApiError) throw error;
       throw ApiError.internal('Erro interno ao deletar usuário.');
     }
   }
