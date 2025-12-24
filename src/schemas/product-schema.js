@@ -8,7 +8,6 @@ export const productSchema = z.object({
   category_id: z.number().int().positive().nullable().optional(),
   brand: z.string().min(2).max(50).optional(),
   price: z.number().nonnegative(),
-  discount_price: z.number().nonnegative().nullable().optional(),
   stock: z.number().int().nonnegative().default(0),
   weight: z.number().nonnegative().nullable().optional(),
   width: z.number().nonnegative().nullable().optional(),

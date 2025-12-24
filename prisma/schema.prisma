@@ -26,7 +26,6 @@ model Product {
   category_id    Int?
   brand          String?        @db.VarChar(100)
   price          Decimal        @db.Decimal(10, 2)
-  discount_price Decimal?       @db.Decimal(10, 2)
   stock          Int?           @default(0)
   weight         Decimal?       @db.Decimal(10, 3)
   width          Decimal?       @db.Decimal(10, 2)

@@ -61,7 +61,6 @@ export function formatProductData(data = {}) {
   const price = cleanNumber(data.price, 'price');
   const stock = cleanOptionalNumber(data.stock, 'stock') ?? 0;
 
-  const discount_price = cleanOptionalNumber(data.discount_price, 'discount_price');
   const category_id = cleanOptionalNumber(data.category_id, 'category_id');
 
   const weight = cleanOptionalNumber(data.weight, 'weight');
@@ -79,7 +78,6 @@ export function formatProductData(data = {}) {
     category_id,
     brand: brand || null,
     price,
-    discount_price,
     stock,
     weight,
     width,

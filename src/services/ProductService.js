@@ -10,11 +10,17 @@ class ProductService {
     return prisma.product.findMany({
       orderBy: { id: 'desc' },
       include: {
-        product_images: {
+        images: {
           select: {
             id: true,
             url: true,
             public_id: true,
+          },
+        },
+        category: {
+          select: {
+            id: true,
+            name: true,
           },
         },
       },
@@ -114,10 +120,13 @@ class ProductService {
 
       // Deleta as imagens do Cloudinary antes de deletar o produto
       if (existing.product_images && existing.product_images.length > 0) {
-        const deletePromises = existing.product_images.map((image) =>
-          cloudinary.uploader.destroy(image.public_id).catch((error) => {
+        const deletePromises = existing.product_images.map(image =>
+          cloudinary.uploader.destroy(image.public_id).catch(error => {
             // Log do erro mas não impede a deleção do produto
-            console.error(`Erro ao deletar imagem do Cloudinary (public_id: ${image.public_id}):`, error);
+            console.error(
+              `Erro ao deletar imagem do Cloudinary (public_id: ${image.public_id}):`,
+              error
+            );
           })
         );
 
