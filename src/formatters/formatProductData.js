@@ -63,11 +63,6 @@ export function formatProductData(data = {}) {
 
   const category_id = cleanOptionalNumber(data.category_id, 'category_id');
 
-  const weight = cleanOptionalNumber(data.weight, 'weight');
-  const width = cleanOptionalNumber(data.width, 'width');
-  const height = cleanOptionalNumber(data.height, 'height');
-  const length = cleanOptionalNumber(data.length, 'length');
-
   const is_active = data.is_active === undefined ? true : cleanBoolean(data.is_active, 'is_active');
 
   return {
@@ -79,10 +74,6 @@ export function formatProductData(data = {}) {
     brand: brand || null,
     price,
     stock,
-    weight,
-    width,
-    height,
-    length,
     is_active,
   };
 }

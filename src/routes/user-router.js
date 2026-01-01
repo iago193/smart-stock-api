@@ -5,8 +5,8 @@ import auth from '../middlewares/auth.js';
 const router = Router();
 
 router.get('/', auth, UserController.index);
-router.post('/create', auth, UserController.create);
-router.put('/update/:id', auth, UserController.update);
-router.delete('/delete/:id', auth, UserController.delete);
+router.post('/', auth, UserController.create);
+router.put('/:id', auth, UserController.update);
+router.delete('/:id', auth, UserController.delete);
 
 export default router;

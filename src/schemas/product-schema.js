@@ -9,10 +9,6 @@ export const productSchema = z.object({
   brand: z.string().min(2).max(50).optional(),
   price: z.number().nonnegative(),
   stock: z.number().int().nonnegative().default(0),
-  weight: z.number().nonnegative().nullable().optional(),
-  width: z.number().nonnegative().nullable().optional(),
-  height: z.number().nonnegative().nullable().optional(),
-  length: z.number().nonnegative().nullable().optional(),
 
   image_url: z.string().url().nullable().optional(),
 
