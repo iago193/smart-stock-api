@@ -102,9 +102,3 @@ Este projeto demonstra conhecimento em:
 - Segurança de aplicações web
 - Arquitetura de software escalável
 - ORM e gerenciamento de banco de dados
-
----
-
-**Desenvolvido com foco em qualidade, segurança e escalabilidade! 🚀**
-
-#NodeJS #ExpressJS #RESTAPI #BackendDevelopment #Prisma #MySQL #JWT #Cloudinary #APIDevelopment #SoftwareArchitecture
