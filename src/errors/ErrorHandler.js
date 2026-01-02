@@ -4,6 +4,10 @@ import ApiError from './ApiError.js';
 export default function errorHandler(err, req, res, next) {
   // Erros controlados da aplicação
   if (err instanceof ApiError) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.error(err);
+    }
+
     return res.status(err.statusCode).json({
       message: err.message,
       details: err.details ?? null,

@@ -5,14 +5,18 @@ class HistoryController {
     res.status(200).json('Histórico criado');
   }
 
-  create(req, res) {
-    const response = HistoryService.create(req.body);
-    res.status(201).json({
-      data: {
-        message: 'Histórico criado',
-        response,
-      },
-    });
+  async create(req, res, next) {
+    try {
+      const response = await HistoryService.create(req.body);
+      res.status(201).json({
+        data: {
+          message: 'Histórico criado',
+          response,
+        },
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 

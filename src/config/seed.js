@@ -29,3 +29,23 @@ main()
   });
 
 //npx prisma db seed
+
+/*
+INSERT INTO users (
+  first_name,
+  last_name,
+  email,
+  password_hash,
+  role_id,
+  created_at,
+  updated_at
+) VALUES (
+  'Admin',
+  'Sistema',
+  'admin@admin.com',
+  '$2a$10$e0NMVRBzG0cSi0UIqgupr.PR6A93yyjQKQlzZdWa9yQ3PDss6dzn.',
+  1,
+  NOW(),
+  NOW()
+);
+*/
