@@ -28,6 +28,7 @@ class TokenService {
 
     const token = generateToken({
       id: user.id,
+      name: user.first_name,
       email: user.email,
       role: user.role.name,
     });

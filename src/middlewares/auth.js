@@ -27,13 +27,13 @@ const authMiddleware = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    req.user = {
+    ((req.user = {
       id: decoded.id,
+      name: decoded.first_name,
       email: decoded.email,
       role: decoded.role,
-    };
-
-    next();
+    }),
+      next());
   } catch {
     return next(ApiError.unauthorized('Token inválido ou expirado.'));
   }
