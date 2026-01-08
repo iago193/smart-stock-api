@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import HistoryControler from '../controllers/HistoryControler.js';
-import auth from '../middlewares/auth.js';
+import authMiddlewares from '../middlewares/auth-middlewares.js';
 
 const router = Router();
 
 router.get('/', HistoryControler.index);
-router.post('/', auth, HistoryControler.create);
+router.post('/', authMiddlewares, HistoryControler.create);
 
 export default router;

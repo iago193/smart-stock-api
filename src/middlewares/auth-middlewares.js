@@ -2,22 +2,11 @@ import jwt from 'jsonwebtoken';
 import ApiError from '../errors/ApiError.js';
 
 const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader) {
-    return next(ApiError.unauthorized('Token não fornecido.'));
-  }
-
-  const parts = authHeader.split(' ');
-
-  if (parts.length !== 2 || parts[0] !== 'Bearer') {
-    return next(ApiError.unauthorized('Formato de token inválido. Use: Bearer <token>'));
-  }
-
-  const token = parts[1];
+  // 🔐 Token vem do cookie
+  const token = req.cookies?.token;
 
   if (!token) {
-    return next(ApiError.unauthorized('Token não fornecido.'));
+    return next(ApiError.unauthorized('Não autenticado.'));
   }
 
   if (!process.env.JWT_SECRET) {
@@ -27,13 +16,14 @@ const authMiddleware = (req, res, next) => {
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-    ((req.user = {
+    req.user = {
       id: decoded.id,
-      name: decoded.first_name,
+      name: decoded.name,
       email: decoded.email,
       role: decoded.role,
-    }),
-      next());
+    };
+
+    return next();
   } catch {
     return next(ApiError.unauthorized('Token inválido ou expirado.'));
   }

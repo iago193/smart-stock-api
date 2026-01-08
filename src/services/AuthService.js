@@ -3,7 +3,7 @@ import { prisma } from '../lib/prismaClient.js';
 import generateToken from '../utils/generateToken.js';
 import bcrypt from 'bcrypt';
 
-class TokenService {
+class AuthService {
   async login(email, password) {
     const user = await prisma.user.findUnique({
       where: { email },
@@ -37,4 +37,4 @@ class TokenService {
   }
 }
 
-export default new TokenService();
+export default new AuthService();

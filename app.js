@@ -4,8 +4,9 @@ import productRouter from './src/routes/product-router.js';
 import usersRouter from './src/routes/user-router.js';
 import errorHandler from './src/errors/ErrorHandler.js';
 import uploadRouter from './src/routes/upload-router.js';
-import tokenRouter from './src/routes/token-router.js';
+import authRouter from './src/routes/auth-router.js';
 import historyRouter from './src/routes/history-router.js';
+import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -26,6 +27,7 @@ class App {
 
   middlewares() {
     this.app.use(cors(corsOptions));
+    this.app.use(cookieParser());
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: true }));
   }
@@ -35,7 +37,7 @@ class App {
     this.app.use('/history', historyRouter);
     this.app.use('/users', usersRouter);
     this.app.use('/upload', uploadRouter);
-    this.app.use('/login', tokenRouter);
+    this.app.use('/login', authRouter);
   }
 
   errorHandler() {
