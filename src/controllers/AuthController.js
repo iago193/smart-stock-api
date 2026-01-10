@@ -16,7 +16,7 @@ class AuthController {
           sameSite: isProd ? 'none' : 'lax',
           maxAge: 60 * 60 * 1000 * 24,
           path: '/',
-          domain: isProd ? 'meudominio.com' : 'localhost',
+          ...(isProd && { domain: '.meudominio.com' }),
         })
         .json({
           success: true,

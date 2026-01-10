@@ -13,16 +13,28 @@ class UserService {
     if (role !== 'owner' && role !== 'manager')
       throw ApiError.unauthorized('Você não tem autorização para fazer isso!.');
 
-    const user = await prisma.user.findMany({
-      include: {
-        role: true,
+    const users = await prisma.user.findMany({
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true,
+        email: true,
+        role_id: true,
+        created_at: true,
+        updated_at: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
     });
 
-    if (!user) {
+    if (!users) {
       throw ApiError.notFound('Usuário não encontrado.');
     }
-    return user;
+    return users;
   }
   async create(data, role) {
     try {
@@ -52,6 +64,7 @@ class UserService {
           updated_at: true,
         },
       });
+
       return userCreate;
     } catch (error) {
       if (error instanceof ZodError) {
