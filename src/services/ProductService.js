@@ -1,4 +1,4 @@
-import { prisma } from '../lib/prismaClient.js';
+import { prisma } from '../config/prismaClient.js';
 import { formatProductData } from '../formatters/formatProductData.js';
 import { productSchema } from '../schemas/product-schema.js';
 import ApiError from '../errors/ApiError.js';

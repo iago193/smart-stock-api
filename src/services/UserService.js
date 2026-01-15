@@ -1,4 +1,4 @@
-import { prisma } from '../lib/prismaClient.js';
+import { prisma } from '../config/prismaClient.js';
 import { formatUserData } from '../formatters/formatUserData.js';
 import { formatUserUpdateData } from '../formatters/formatUserData.js';
 import { userSchema } from '../schemas/user-schema.js';

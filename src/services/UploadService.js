@@ -1,6 +1,6 @@
 import ApiError from '../errors/ApiError.js';
 import cloudinary from '../lib/cloudinary.js';
-import { prisma } from '../lib/prismaClient.js';
+import { prisma } from '../config/prismaClient.js';
 
 class UploadService {
   async uploadImage(file, id, userRole) {

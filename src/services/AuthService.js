@@ -1,5 +1,5 @@
 import ApiError from '../errors/ApiError.js';
-import { prisma } from '../lib/prismaClient.js';
+import { prisma } from '../config/prismaClient.js';
 import generateToken from '../utils/generateToken.js';
 import bcrypt from 'bcrypt';
 

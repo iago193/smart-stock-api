@@ -6,6 +6,7 @@ import errorHandler from './src/errors/ErrorHandler.js';
 import uploadRouter from './src/routes/upload-router.js';
 import authRouter from './src/routes/auth-router.js';
 import historyRouter from './src/routes/history-router.js';
+import categoryRouter from './src/routes/category-router.js';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
@@ -38,6 +39,7 @@ class App {
     this.app.use('/users', usersRouter);
     this.app.use('/upload', uploadRouter);
     this.app.use('/login', authRouter);
+    this.app.use('/categories', categoryRouter);
   }
 
   errorHandler() {

@@ -1,4 +1,4 @@
-import { prisma } from '../lib/prismaClient.js';
+import { prisma } from '../config/prismaClient.js';
 import ApiError from '../errors/ApiError.js';
 
 class HistoryService {
