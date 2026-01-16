@@ -6,6 +6,9 @@ import { ZodError } from 'zod';
 import cloudinary from '../lib/cloudinary.js';
 
 class ProductService {
+  constructor() {
+    this.allowedRoles = ['owner', 'manager'];
+  }
   async read() {
     return prisma.product.findMany({
       orderBy: { id: 'desc' },
@@ -29,7 +32,7 @@ class ProductService {
 
   async create(data, role) {
     try {
-      if (role !== 'owner' && role !== 'manager' && role !== 'box') {
+      if (!this.allowedRoles.includes(role) && role !== 'box') {
         throw ApiError.unauthorized('Você não tem autorização para criar produtos.');
       }
 
@@ -59,7 +62,7 @@ class ProductService {
 
   async update(id, data, role) {
     try {
-      if (role !== 'owner' && role !== 'manager' && role !== 'box') {
+      if (!this.allowedRoles.includes(role) && role !== 'box') {
         throw ApiError.unauthorized('Você não tem autorização para atualizar produtos.');
       }
 
@@ -98,7 +101,7 @@ class ProductService {
 
   async delete(id, role) {
     try {
-      if (role !== 'owner' && role !== 'manager') {
+      if (!this.allowedRoles.includes(role)) {
         throw ApiError.unauthorized('Você não tem autorização para deletar produtos.');
       }
 

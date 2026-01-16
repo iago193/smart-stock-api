@@ -16,7 +16,8 @@ class CategoryController {
 
   async create(req, res, next) {
     try {
-      const response = await CategoryService.create(req.body);
+      const { role } = req.user;
+      const response = await CategoryService.create(req.body, role);
       return res.status(201).json({
         success: true,
         message: 'Categoria criada com sucesso',
@@ -27,18 +28,33 @@ class CategoryController {
     }
   }
 
-  async update(req, res) {
-    return res.status(200).json({
-      success: true,
-      message: 'Categoria atualizada com sucesso',
-    });
+  async update(req, res, next) {
+    try {
+      const { role } = req.user;
+      const { id } = req.params;
+      const response = await CategoryService.update(id, req.body, role);
+      return res.status(200).json({
+        success: true,
+        message: 'Categoria atualizada com sucesso',
+        data: response,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
-  async delete(req, res) {
-    return res.status(200).json({
-      success: true,
-      message: 'Categoria deletada com sucesso',
-    });
+  async delete(req, res, next) {
+    try {
+      const { role } = req.user;
+      const { id } = req.params;
+      await CategoryService.delete(id, role);
+      return res.status(200).json({
+        success: true,
+        message: 'Categoria deletada com sucesso',
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 }
 
