@@ -1,6 +1,7 @@
 import { prisma } from '../config/prismaClient.js';
 import { formatProductData } from '../formatters/formatProductData.js';
-import { productSchema } from '../schemas/product-schema.js';
+import { formatProductEditData } from '../formatters/formatProductEditData.js';
+import { productSchema, productEditSchema } from '../schemas/product-schema.js';
 import ApiError from '../errors/ApiError.js';
 import { ZodError } from 'zod';
 import cloudinary from '../lib/cloudinary.js';
@@ -32,7 +33,7 @@ class ProductService {
 
   async create(data, role) {
     try {
-      if (!this.allowedRoles.includes(role) && role !== 'box') {
+      if (!this.allowedRoles.includes(role) && role !== 'stock') {
         throw ApiError.unauthorized('Você não tem autorização para criar produtos.');
       }
 
@@ -62,12 +63,12 @@ class ProductService {
 
   async update(id, data, role) {
     try {
-      if (!this.allowedRoles.includes(role) && role !== 'box') {
+      if (!this.allowedRoles.includes(role) && role !== 'stock') {
         throw ApiError.unauthorized('Você não tem autorização para atualizar produtos.');
       }
 
-      const formatted = formatProductData(data);
-      const validated = productSchema.partial().parse(formatted);
+      const formatted = formatProductEditData(data);
+      const validated = productEditSchema.partial().parse(formatted);
 
       const existing = await prisma.product.findUnique({
         where: { id: Number(id) },

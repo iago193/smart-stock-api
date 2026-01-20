@@ -3,12 +3,27 @@ import ApiError from '../errors/ApiError.js';
 
 class HistoryService {
   async create(body) {
-    if (!body || !Array.isArray(body.items) || body.items.length === 0) {
-      throw ApiError.internal('Erro interno ao criar Histórico.');
+    if (!body?.operator || !Array.isArray(body.items) || body.items.length === 0) {
+      throw ApiError.internal('Erro interno ao criar histórico.');
     }
 
-    const historyCriated = await prisma.history.create({ data: body });
-    return historyCriated;
+    const items = body.items.map(item => ({
+      productId: item.id ?? null,
+      productName: item.name,
+      productSku: item.sku,
+      categoryName: item.category?.name ?? null,
+      unitPrice: Number(item.price),
+      quantity: Number(item.quantity),
+      total: Number(item.price) * Number(item.quantity),
+    }));
+
+    return prisma.history.create({
+      data: {
+        operator: body.operator,
+        total: Number(body.total),
+        items,
+      },
+    });
   }
 }
 
