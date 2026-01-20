@@ -3,23 +3,32 @@ import cloudinary from '../lib/cloudinary.js';
 import { prisma } from '../config/prismaClient.js';
 
 class UploadService {
-  async uploadImage(file, id, userRole) {
-    const productId = Number(id);
+  async uploadUserAvatar(file, userId) {
+    const id = Number(userId);
 
-    if (Number.isNaN(productId) && productId <= 0) {
-      throw ApiError.badRequest('ID do produto inválido.');
+    if (!file) {
+      throw ApiError.badRequest('Arquivo de imagem não enviado.');
     }
 
-    const existing = await prisma.product.findUnique({
-      where: { id: productId },
+    if (Number.isNaN(id) || id <= 0) {
+      throw ApiError.badRequest('ID do usuário inválido.');
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: { images: true },
     });
 
-    if (!existing) {
-      throw ApiError.notFound('Produto não encontrado');
+    if (!user) {
+      throw ApiError.notFound('Usuário não encontrado.');
     }
 
-    if (userRole !== 'owner' && userRole !== 'manager' && userRole !== 'stock') {
-      throw ApiError.unauthorized('Você não tem permissão para fazer upload de imagens.');
+    if (user.images.length > 0) {
+      await Promise.all(user.images.map(img => cloudinary.uploader.destroy(img.public_id)));
+
+      await prisma.userImage.deleteMany({
+        where: { user_id: id },
+      });
     }
 
     let uploadResult;
@@ -27,7 +36,7 @@ class UploadService {
     try {
       uploadResult = await new Promise((resolve, reject) => {
         cloudinary.uploader
-          .upload_stream({ folder: 'produtos' }, (error, result) => {
+          .upload_stream({ folder: 'users' }, (error, result) => {
             if (error) return reject(error);
             resolve(result);
           })
@@ -37,9 +46,10 @@ class UploadService {
       throw ApiError.internal('Erro ao enviar imagem para o Cloudinary.');
     }
 
-    const createdImage = await prisma.productImage.create({
+    // 💾 Cria nova imagem relacionada ao usuário
+    const createdImage = await prisma.userImage.create({
       data: {
-        product_id: productId,
+        user_id: id,
         url: uploadResult.secure_url,
         public_id: uploadResult.public_id,
       },

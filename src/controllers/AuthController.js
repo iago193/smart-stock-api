@@ -27,12 +27,20 @@ class AuthController {
     }
   }
 
-  me(req, res) {
-    const user = req.user;
-    res.status(200).json({
-      success: true,
-      user,
-    });
+  async me(req, res, next) {
+    const { id } = req.user;
+
+    try {
+      const user = await authService.me(id);
+
+      return res.status(200).json({
+        success: true,
+        user,
+      });
+    } catch (error) {
+      next(error);
+      return;
+    }
   }
 
   logout(req, res) {

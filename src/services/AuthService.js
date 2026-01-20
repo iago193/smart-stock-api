@@ -28,12 +28,52 @@ class AuthService {
 
     const token = generateToken({
       id: user.id,
-      name: user.first_name,
-      email: user.email,
-      role: user.role.name,
     });
 
     return token;
+  }
+
+  async me(id) {
+    const user = await prisma.user.findUnique({
+      where: { id: Number(id) },
+      select: {
+        id: true,
+        first_name: true,
+        last_name: true,
+        email: true,
+        role: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        images: {
+          select: {
+            url: true,
+          },
+          orderBy: {
+            created_at: 'desc',
+          },
+          take: 1, // 👈 avatar atual
+        },
+        created_at: true,
+        updated_at: true,
+      },
+    });
+
+    if (!user) {
+      throw ApiError.notFound('Usuário não encontrado.');
+    }
+
+    return {
+      id: user.id,
+      name: `${user.first_name} ${user.last_name}`,
+      email: user.email,
+      role: user.role?.name,
+      avatar: user.images[0]?.url ?? null,
+      created_at: user.created_at,
+      updated_at: user.updated_at,
+    };
   }
 }
 
