@@ -22,8 +22,8 @@ class ProductController {
 
   async create(req, res, next) {
     try {
-      const role = req.user?.role;
-      const response = await product.create(req.body, role);
+      const currentUserId = req.user.id;
+      const response = await product.create(req.body, currentUserId);
       res.status(201).json({
         message: 'Produto criado com sucesso!',
         data: response,
@@ -36,8 +36,8 @@ class ProductController {
   async update(req, res, next) {
     try {
       const { id } = req.params;
-      const role = req.user?.role;
-      const response = await product.update(id, req.body, role);
+      const currentUserId = req.user.id;
+      const response = await product.update(id, req.body, currentUserId);
       res.status(200).json({
         message: 'Produto editado com sucesso!',
         data: response,
@@ -50,8 +50,8 @@ class ProductController {
   async delete(req, res, next) {
     try {
       const { id } = req.params;
-      const role = req.user?.role;
-      const response = await product.delete(id, role);
+      const currentUserId = req.user.id;
+      const response = await product.delete(id, currentUserId);
 
       res.status(200).json({
         message: 'Produto deletado com sucesso!',

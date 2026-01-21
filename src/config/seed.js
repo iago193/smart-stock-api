@@ -30,6 +30,8 @@ main()
 
 //npx prisma db seed
 
+//SQL PURO
+//password do admin: admin123
 /*
 INSERT INTO users (
   first_name,

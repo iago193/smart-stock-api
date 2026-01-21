@@ -5,11 +5,10 @@ import { productSchema, productEditSchema } from '../schemas/product-schema.js';
 import ApiError from '../errors/ApiError.js';
 import { ZodError } from 'zod';
 import cloudinary from '../lib/cloudinary.js';
+import { roles } from '../constants/roles.js';
+import RoleService from './RoleService.js';
 
 class ProductService {
-  constructor() {
-    this.allowedRoles = ['owner', 'manager'];
-  }
   async read() {
     return prisma.product.findMany({
       orderBy: { id: 'desc' },
@@ -31,9 +30,10 @@ class ProductService {
     });
   }
 
-  async create(data, role) {
+  async create(data, currentUserId) {
     try {
-      if (!this.allowedRoles.includes(role) && role !== 'stock') {
+      const role = await RoleService.getByRoles(currentUserId);
+      if (role !== roles.OWNER && role !== roles.MANAGER && role !== roles.STOCK) {
         throw ApiError.unauthorized('Você não tem autorização para criar produtos.');
       }
 
@@ -61,9 +61,10 @@ class ProductService {
     }
   }
 
-  async update(id, data, role) {
+  async update(id, data, currentUserId) {
     try {
-      if (!this.allowedRoles.includes(role) && role !== 'stock') {
+      const role = await RoleService.getByRoles(currentUserId);
+      if (role !== roles.OWNER && role !== roles.MANAGER && role !== roles.STOCK) {
         throw ApiError.unauthorized('Você não tem autorização para atualizar produtos.');
       }
 
@@ -100,9 +101,10 @@ class ProductService {
     }
   }
 
-  async delete(id, role) {
+  async delete(id, currentUserId) {
     try {
-      if (!this.allowedRoles.includes(role)) {
+      const role = await RoleService.getByRoles(currentUserId);
+      if (role !== roles.OWNER && role !== roles.MANAGER) {
         throw ApiError.unauthorized('Você não tem autorização para deletar produtos.');
       }
 

@@ -7,10 +7,14 @@ import ApiError from '../errors/ApiError.js';
 import { ZodError } from 'zod';
 import bcrypt from 'bcrypt';
 import cloudinary from '../lib/cloudinary.js';
+import { roles } from '../constants/roles.js';
+import RoleService from './RoleService.js';
 
 class UserService {
-  async read(role) {
-    if (role !== 'owner' && role !== 'manager')
+  async read(currentUserId) {
+    const role = await RoleService.getByRoles(currentUserId);
+
+    if (role !== roles.OWNER && role !== roles.MANAGER)
       throw ApiError.unauthorized('Você não tem autorização para fazer isso!.');
 
     const users = await prisma.user.findMany({
@@ -36,9 +40,10 @@ class UserService {
     }
     return users;
   }
-  async create(data, role) {
+  async create(data, currentUserId) {
     try {
-      if (role !== 'owner' && role !== 'manager')
+      const role = await RoleService.getByRoles(currentUserId);
+      if (role !== roles.OWNER && role !== roles.MANAGER)
         throw ApiError.unauthorized('Você não tem autorização para fazer isso!.');
 
       const formatted = formatUserData(data);
@@ -74,9 +79,10 @@ class UserService {
       throw ApiError.internal('Erro interno ao criar usuário.');
     }
   }
-  async update(data, id, role) {
+  async update(data, id, currentUserId) {
     try {
-      if (role !== 'owner' && role !== 'manager')
+      const role = await RoleService.getByRoles(currentUserId);
+      if (role !== roles.OWNER && role !== roles.MANAGER)
         throw ApiError.unauthorized('Você não tem autorização para fazer isso!.');
 
       const userExisting = await prisma.user.findUnique({
@@ -134,9 +140,10 @@ class UserService {
       throw ApiError.internal('Erro interno ao atualizar usuário.');
     }
   }
-  async delete(id, role, currentUserId) {
+  async delete(id, currentUserId) {
     try {
-      if (!['owner', 'manager'].includes(role)) {
+      const role = await RoleService.getByRoles(currentUserId);
+      if (role !== roles.OWNER && role !== roles.MANAGER) {
         throw ApiError.unauthorized('Você não tem autorização para deletar usuários.');
       }
 
