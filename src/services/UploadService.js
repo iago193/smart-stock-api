@@ -3,8 +3,8 @@ import cloudinary from '../lib/cloudinary.js';
 import { prisma } from '../config/prismaClient.js';
 
 class UploadService {
-  async uploadUserAvatar(file, userId) {
-    const id = Number(userId);
+  async uploadUserAvatar(file, currentUserId) {
+    const id = Number(currentUserId);
 
     if (!file) {
       throw ApiError.badRequest('Arquivo de imagem não enviado.');

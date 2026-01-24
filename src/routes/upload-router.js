@@ -5,6 +5,6 @@ import authMiddlewares from '../middlewares/auth-middlewares.js';
 
 const router = Router();
 
-router.post('/:id', authMiddlewares, upload.single('image'), UploadController.upload);
+router.post('/', authMiddlewares, upload.single('image'), UploadController.upload);
 
 export default router;

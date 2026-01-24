@@ -4,13 +4,13 @@ class UploadController {
   async upload(req, res, next) {
     try {
       const file = req.file;
-      const { id } = req.user.id;
+      const currentUserId = req.user.id;
 
       if (!file) {
         return res.status(400).json({ error: 'Nenhum arquivo enviado' });
       }
 
-      const response = await UploadService.uploadUserAvatar(file, id);
+      const response = await UploadService.uploadUserAvatar(file, currentUserId);
 
       res.json({
         message: 'Upload concluído!',
