@@ -10,7 +10,7 @@ class UploadController {
         return res.status(400).json({ error: 'Nenhum arquivo enviado' });
       }
 
-      const response = await UploadService.uploadImage(file, id);
+      const response = await UploadService.uploadUserAvatar(file, id);
 
       res.json({
         message: 'Upload concluído!',
