@@ -2,6 +2,14 @@ import { prisma } from '../config/prismaClient.js';
 import ApiError from '../errors/ApiError.js';
 
 class HistoryService {
+  async index() {
+    const response = await prisma.history.findMany({
+      orderBy: { id: 'desc' },
+    });
+
+    return response;
+  }
+
   async create(body) {
     if (!body?.operator || !Array.isArray(body.items) || body.items.length === 0) {
       throw ApiError.internal('Erro interno ao criar histórico.');

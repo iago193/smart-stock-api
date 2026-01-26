@@ -1,8 +1,16 @@
 import HistoryService from '../services/HistoryService.js';
 
 class HistoryController {
-  index(req, res) {
-    res.status(200).json('Histórico criado');
+  async index(req, res, next) {
+    try {
+      const response = await HistoryService.index();
+      res.status(200).json({
+        success: true,
+        data: response,
+      });
+    } catch (error) {
+      next(error);
+    }
   }
 
   async create(req, res, next) {
