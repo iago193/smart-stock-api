@@ -3,34 +3,34 @@ version: '3.8'
 services:
   app:
     build: .
-    container_name: app-node
+    container_name: smart-stock-api
     restart: always
     ports:
-      - '3000:3000'
+      - '3001:3001'
     env_file:
       - .env
     depends_on:
       - mysql
     networks:
-      - app-network
+      - smart-stock-network
 
   mysql:
     image: mysql:8
     container_name: mysql-db
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: iagobruno
+      MYSQL_DATABASE: smart-stock
     ports:
       - '3306:3306'
     volumes:
       - mysql_data:/var/lib/mysql
     networks:
-      - app-network
+      - smart-stock-network
 
 volumes:
   mysql_data:
 
 networks:
-  app-network:
+  smart-stock-network:
     driver: bridge
